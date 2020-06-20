@@ -1,6 +1,6 @@
-# Streamlit web app for data visualization
+# Web App For Data Visualization
 
-Streamlit’s open-source app framework is the easiest way for data scientists and machine learning engineers to create beautiful, performant apps in only a few hours!  All in pure Python. All for free.
+Beautiful Web interface made with Streamlit for quick Exploratory Data Analysis uisng various libraries like matplotlib, seaborn, and pandas to automate the whole process.
 
 ## Dependancies
 ```python
