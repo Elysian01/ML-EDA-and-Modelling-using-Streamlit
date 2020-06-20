@@ -10,6 +10,6 @@ pip install -r Requirements.txt
 
 ## Run
 
-```shell
+```python
 streamlit run Main.py
 ```
