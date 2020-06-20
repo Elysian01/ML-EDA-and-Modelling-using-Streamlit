@@ -1,0 +1,6 @@
+# Similar Projects
+Github :- https://github.com/vishalsiram/StreamlitDataVisualizationApp
+
+# Youtube 
+Building Automated Exploratory Data Analysis Project- Project From Subscriber
+Link :- https://youtu.be/blScxaT9iUQ
