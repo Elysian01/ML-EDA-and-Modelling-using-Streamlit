@@ -5,7 +5,7 @@ Streamlit’s open-source app framework is the easiest way for data scientists a
 ## Dependancies
 ```python
 pip install -r requirements.txt
-'''
+```
 
 ## Run
 ```shell
