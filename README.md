@@ -3,11 +3,13 @@
 Beautiful Web interface made with Streamlit for quick Exploratory Data Analysis using various libraries like matplotlib, seaborn, and pandas to automate the whole process.
 
 ## Dependancies
+
 ```python
-pip install -r requirements.txt
+pip install -r Requirements.txt
 ```
 
 ## Run
+
 ```shell
-streamlit run main.py
+streamlit run Main.py
 ```
