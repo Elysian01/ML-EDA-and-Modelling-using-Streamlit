@@ -1,3 +1,5 @@
+import time
+import datetime
 import streamlit as st
 
 # To run :- streamlit run Streamlit_Cheatsheet.py
@@ -30,7 +32,7 @@ st.write(range(10))
 # img = Image.open("1.jpg")
 # st.image(img , width = 300 , caption = "Simple Image")
 
-# Showing Video 
+# Showing Video
 # vid_file = open("example.mp4","rd").read()
 # st.video(vid_file)
 
@@ -42,37 +44,39 @@ st.write(range(10))
 
 # Cjeckbox
 if st.checkbox("Show/Hide"):
-     st.text("Showing Text")
+    st.text("Showing Text")
 
 # Radio
-status = st.radio("What is your status",("Active","Inactive"))
+status = st.radio("What is your status", ("Active", "Inactive"))
 if status == "Active":
-     st.success("You are Active")
+    st.success("You are Active")
 else:
-     st.warning("You are Inactive")
+    st.warning("You are Inactive")
 
 # Select Box
-occupation = st.selectbox("Your Occupation",["Programmer","DataScientist","Doctor","Police"])
-st.write("You Selected this option ",occupation )
+occupation = st.selectbox(
+    "Your Occupation", ["Programmer", "DataScientist", "Doctor", "Police"])
+st.write("You Selected this option ", occupation)
 
 # MultiSelect
-location = st.multiselect("Where do you work ? ", ("London" , "Mumbai","New York","Delhi"))
-st.write("You Selected " , len(location) , "locations")
+location = st.multiselect("Where do you work ? ",
+                          ("London", "Mumbai", "New York", "Delhi"))
+st.write("You Selected ", len(location), "locations")
 
 # Slider
-level = st.slider("What's is your level",1,5)
+level = st.slider("What's is your level", 1, 5)
 
 # Buttons
 st.button("Simple Button")
 
 if st.button("About"):
-     st.text("About button activated")
+    st.text("About button activated")
 
-# Text Input 
+# Text Input
 firstname = st.text_input("Enter your first name", "Type here ...")
 if st.button("Submit"):
-     result = firstname.title()
-     st.success(result)
+    result = firstname.title()
+    st.success(result)
 
 # Text Area
 message = st.text_area("Enter your meassage", "Type here ...")
@@ -81,34 +85,32 @@ message = st.text_area("Enter your meassage", "Type here ...")
 #      st.success(result)
 
 # Date Input
-import datetime
 today = st.date_input("Today is", datetime.datetime.now())
 # Time
 time = st.time_input("The time is ", datetime.time())
 
 # Dislaying JSON
 st.text("Displaying JSON")
-st.json({"name":'Abhi' , "age":20 , "gender": "male"})
+st.json({"name": 'Abhi', "age": 20, "gender": "male"})
 
 # Displaying Raw Code
 st.text("Displaying Raw Code")
 st.code("import numpy as np")
 
-# or 
+# or
 
 with st.echo():
-     import pandas as pd
-     df = pd.DataFrame()
+    import pandas as pd
+    df = pd.DataFrame()
 
 # Progress Bar
-import time 
 my_bar = st.progress(0)
 for p in range(10):
-     my_bar.progress(p +1)
+    my_bar.progress(p + 1)
 
 # Spinner
 with st.spinner("Waiting ... "):
-     time.sleep(5)
+    time.sleep(5)
 st.success("Finished")
 
 # Ballons
@@ -118,13 +120,17 @@ st.balloons()
 st.sidebar.header("About")
 st.sidebar.text("small text")
 
-# Functions 
-@st.cache # to make it faster
+# Functions
+
+
+@st.cache  # to make it faster
 def run_fxn():
-     return range(100)
+    return range(100)
+
+
 st.write(run_fxn())
 
-# Plots 
+# Plots
 st.pyplot()
 
 # Dataframe

@@ -5,11 +5,11 @@ Beautiful Web interface made with Streamlit for quick Exploratory Data Analysis 
 ## Dependancies
 
 ```python
-pip install -r Requirements.txt
+pip install -r requirements.txt
 ```
 
 ## Run
 
 ```python
-streamlit run Main.py
+streamlit run main.py
 ```
