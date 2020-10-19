@@ -13,27 +13,11 @@ fig , ax = plt.subplots()
 
 
 
-def main():
-    st.beta_set_page_config("Data Explorer")
-    st.title("ML Dataset Explorer")
-    st.subheader("Simple Data Science Explorer")
-
-    def file_selector(folder_path = "."):
-        filenames = os.listdir(folder_path)
-        selected_filename = st.selectbox("Select a data file",filenames)
-
-        return os.path.join(folder_path,selected_filename)
-
-    filename = file_selector("./datasets")
-    formatted_filename = filename.split("/")[2].split(".")[0].title()
-    st.info("You Selected {} Dataset".format(formatted_filename))
-
-    # Read Data
-    df = pd.read_csv(filename)
+def eda(df):
 
     # Show Dataset
     if st.checkbox("Show Dataset"):
-        number = st.number_input("Numbers of rows to view",1)
+        number = st.number_input("Numbers of rows to view",5)
         st.dataframe(df.head(number))
 
     # Show Columns
@@ -136,5 +120,45 @@ def main():
             st.pyplot(fig)
 
     # st.balloons()
+
+
+
+def main():
+
+    st.beta_set_page_config("Data Explorer")
+
+    st.title("ML Dataset Explorer")
+    st.subheader("Simple Data Science Explorer")
+
+    dataframe_selection = st.radio("Please select or upload your dataset",("Upload my own dataset","Choose from popular dataset"))
+    df = pd.DataFrame()
+    df = None
+
+    if dataframe_selection == "Choose from popular dataset":
+        def file_selector(folder_path = "."):
+            filenames = os.listdir(folder_path)
+            selected_filename = st.selectbox("Select a data file",filenames)
+
+            return os.path.join(folder_path,selected_filename)
+
+        filename = file_selector("./datasets")
+        formatted_filename = filename.split("/")[2].split(".")[0].title()
+        st.info("You Selected {} Dataset".format(formatted_filename))
+
+        # Read Data
+        df = pd.read_csv(filename)
+        eda(df)
+
+    elif dataframe_selection == "Upload my own dataset":
+        data = st.file_uploader("Upload a Dataset", type=["csv", "txt"])
+        if data is not None:
+            data.seek(0)
+            st.success("Uploaded Dataset Successfully")
+            df = pd.read_csv(data)
+            eda(df)
+
+
+
+
 if __name__ == "__main__":
     main()
