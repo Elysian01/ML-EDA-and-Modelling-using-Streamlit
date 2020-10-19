@@ -87,6 +87,8 @@ def main():
         st.write(sns.heatmap(df.corr(),annot=True))
         st.pyplot(fig)
 
+        
+
     ## Count Plot
     if st.checkbox("Show Value Count Plots"):
         st.text("Value count by target")
