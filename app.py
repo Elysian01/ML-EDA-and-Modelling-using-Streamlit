@@ -130,6 +130,12 @@ def main():
     st.title("ML Dataset Explorer")
     st.subheader("Simple Data Science Explorer")
 
+    algo_visualization_template = """
+        <h3 style="text-align:center; color: #FF1493;"><a href = "https://elysian01.github.io/Algorithms-Visualization/" target = "_blank">Click here </a> To learn about various algorithms, data structure , encryption and much more </h3><br>
+    """
+
+    st.markdown(algo_visualization_template,unsafe_allow_html=True)
+
     dataframe_selection = st.radio("Please select or upload your dataset",("Upload my own dataset","Choose from popular dataset"))
     df = pd.DataFrame()
     df = None
