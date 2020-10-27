@@ -10,8 +10,15 @@ import matplotlib.pyplot as plt
 
 matplotlib.use("Agg")
 fig , ax = plt.subplots()
+matplotlib.rcParams.update({'font.size': 8})
 
 
+def categorical_column(df, max_unique_values=15):
+    categorical_column_list = []
+    for column in df.columns:
+        if df[column].nunique() < max_unique_values:
+            categorical_column_list.append(column)
+    return categorical_column_list
 
 def eda(df):
 
@@ -47,8 +54,9 @@ def eda(df):
 
     # Show Value Count
     if st.checkbox("Show Value Counts"):
-        st.text("Value Counts by Target/Class")
-        st.write(df.iloc[:,-1].value_counts())
+        all_columns = df.columns.tolist()
+        selected_columns = st.selectbox("Select Column", all_columns)
+        st.write(df[selected_columns].value_counts())
 
     # Show Datatypes
     if st.checkbox("Show Data types"):
@@ -65,34 +73,40 @@ def eda(df):
     st.subheader("Data Visualization")
     all_columns_names = df.columns.tolist()
 
-    ## Correlation Seaborn Plot
+    # Correlation Seaborn Plot
     if st.checkbox("Show Correlation Plot"):
         st.success("Generating Correlation Plot ...")
-        st.write(sns.heatmap(df.corr(),annot=True))
-        st.pyplot(fig)
+        if st.checkbox("Annot the Plot"):
+            st.write(sns.heatmap(df.corr(), annot=True))
+        else:
+            st.write(sns.heatmap(df.corr()))
+        st.pyplot(fig,clear_figure=True)
 
         
 
     ## Count Plot
     if st.checkbox("Show Value Count Plots"):
-        st.text("Value count by target")
-        primary_column = st.selectbox("Primary Column to Groupby",all_columns_names)
-        selected_columns_names_for_cp = st.multiselect("Select Columns",all_columns_names)
+        x = st.selectbox("Select Categorical Column",all_columns_names)
         st.success("Generating Plot ...")
-        if selected_columns_names_for_cp:
-            vc_plot = df.groupby(primary_column)[selected_columns_names_for_cp].count()
-        else:
-            vc_plot = df.iloc[:,-1].value_counts()
-        st.write(vc_plot.plot(kind="bar"))
-        st.pyplot(fig)
+        if x:
+            if st.checkbox("Select Second Categorical column"):
+                hue_all_column_name = df[df.columns.difference([x])].columns
+                hue = st.selectbox("Select Column for Count Plot",hue_all_column_name)
+                st.write(sns.countplot(x = x,hue=hue,data=df,palette = "Set2"))
+            else:
+                st.write(sns.countplot(x = x,data=df,palette = "Set2"))
+            st.pyplot(fig,clear_figure=True)
 
 
-    ## Pie Chart
+    # Pie Chart
     if st.checkbox("Show Pie Plot"):
-        st.success("Generating Pie Chart ...")
         st.set_option('deprecation.showPyplotGlobalUse', False)
-        st.write(df.iloc[:,-1].value_counts().plot.pie(autopct="%1.1f%%"))
-        st.pyplot(fig)
+        all_columns = categorical_column(df)
+        selected_columns = st.selectbox("Select Column", all_columns)
+        st.success("Generating Pie Chart ...")
+        st.write(df[selected_columns].value_counts().plot.pie(
+            autopct="%1.1f%%"))
+        st.pyplot(fig,clear_figure=True)
 
     ## Customizable Plot
     st.subheader("Customizable Plot")
@@ -117,7 +131,7 @@ def eda(df):
             custom_plot = df[selected_columns_names].plot(kind=type_of_plot)
             st.set_option('deprecation.showPyplotGlobalUse', False)
             st.write(custom_plot)
-            st.pyplot(fig)
+            st.pyplot(fig,clear_figure=True)
 
     # st.balloons()
 
@@ -148,7 +162,8 @@ def main():
             return os.path.join(folder_path,selected_filename)
 
         filename = file_selector("./datasets")
-        formatted_filename = filename.split("/")[2].split(".")[0].title()
+        head, formatted_filename = os.path.split(filename)
+        # formatted_filename = filename.split("/")[2].split(".")[0].title()
         st.info("You Selected {} Dataset".format(formatted_filename))
 
         # Read Data
