@@ -1,6 +1,9 @@
 import streamlit as st
 
 from .utils import select_or_upload_dataset
+from apps.algo.logistic import Logistic
+from apps.algo.knn import Knn
+from apps.algo.naive import Naive
 
 
 def modelling(df):
