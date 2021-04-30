@@ -12,14 +12,14 @@ Classification Models which are implemented from scratch using python includes:
 
 <img src="./imgs/demo.gif" alt="demo video" width="500px" height = "500px"/>
 
-## Dependancies
+## Get Started
 
+Install all the dependencies
 ```python
 pip install -r requirements.txt
 ```
 
-## Run
-
+Run the application
 ```python
 streamlit run app.py
 ```
