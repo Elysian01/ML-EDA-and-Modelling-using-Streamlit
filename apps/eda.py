@@ -9,6 +9,7 @@ from .utils import select_or_upload_dataset
 matplotlib.use("Agg")
 fig, ax = plt.subplots()
 matplotlib.rcParams.update({'font.size': 8})
+st.set_option('deprecation.showPyplotGlobalUse', False)
 
 
 def categorical_column(df, max_unique_values=15):
@@ -95,7 +96,6 @@ def eda(df):
 
     # Pie Chart
     if st.checkbox("Show Pie Plot"):
-        st.set_option('deprecation.showPyplotGlobalUse', False)
         all_columns = categorical_column(df)
         selected_columns = st.selectbox("Select Column", all_columns)
         if selected_columns:
@@ -128,7 +128,6 @@ def eda(df):
 
         elif type_of_plot:
             custom_plot = df[selected_columns_names].plot(kind=type_of_plot)
-            st.set_option('deprecation.showPyplotGlobalUse', False)
             st.write(custom_plot)
             st.pyplot()
 
