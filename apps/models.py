@@ -8,7 +8,6 @@ from sklearn import preprocessing
 from .utils import select_or_upload_dataset
 from apps.algo.logistic import LogisticRegression
 from apps.algo.knn import K_Nearest_Neighbors_Classifier
-from apps.algo.naive import Naive
 
 
 def modelling(df):
@@ -19,9 +18,9 @@ def modelling(df):
         st.dataframe(df.head(number))
 
     # Select Algorithm
-    algos = ["Logistic Regression", "Naive Bayes",
-             "K_Nearest_Neighbors_Classifier"]
+    algos = ["Logistic Regression", "Naive Bayes", "K_Nearest_Neighbors_Classifier"]
     selected_algo = st.selectbox("Select Algorithm", algos)
+    print(selected_algo)
 
     if selected_algo:
         st.info("You Selected {} Algorithm".format(selected_algo))
@@ -34,23 +33,36 @@ def modelling(df):
     # Label Encoding
     label_encoder = preprocessing.LabelEncoder()
     encoded_target_data = label_encoder.fit_transform(target_data)
-    encoded_target_data = pd.DataFrame(
-        encoded_target_data, columns=[target_column])
+    encoded_target_data = pd.DataFrame(encoded_target_data, columns=[target_column])
     st.info("You Selected {} Column".format(target_column))
 
     # Select the Remaining Feature
     remain_column = df.drop([target_column], axis=1)
 
     # Train and Test Split
-    test_size = st.slider('Select the size of Test Dataset (train test split)', min_value=0.0, max_value=1.0,
-                          value=0.3, help='Set the ratio for splitting the dataset into Train and Test Dataset')
+    test_size = st.slider(
+        "Select the size of Test Dataset (train test split)",
+        min_value=0.0,
+        max_value=1.0,
+        value=0.3,
+        help="Set the ratio for splitting the dataset into Train and Test Dataset",
+    )
 
     # Set the size of K (only for K-NN)
     if selected_algo == "K_Nearest_Neighbors_Classifier":
-        k_size = st.number_input('Select the size of K', min_value=0, max_value=100,
-                                 value=0, step=1, help='Set the ratio for splitting the Train and Test Dataset')
+        k_size = st.number_input(
+            "Select the size of K",
+            min_value=0,
+            max_value=100,
+            value=0,
+            step=1,
+            help="Set the ratio for splitting the Train and Test Dataset",
+        )
 
-    if st.button("Start Training", help="Training will start for the selected algorithm on dataset"):
+    if st.button(
+        "Start Training",
+        help="Training will start for the selected algorithm on dataset",
+    ):
         if selected_algo == "K_Nearest_Neighbors_Classifier":
 
             Y = encoded_target_data.values
@@ -58,10 +70,11 @@ def modelling(df):
 
             # Splitting dataset into train and test set
             X_train, X_test, Y_train, Y_test = train_test_split(
-                X, Y, test_size=test_size, random_state=0)
+                X, Y, test_size=test_size, random_state=0
+            )
 
             # Model training
-            if(k_size != 0):
+            if k_size != 0:
 
                 model = K_Nearest_Neighbors_Classifier(K=k_size)
                 model.fit(X_train, Y_train)
@@ -89,7 +102,32 @@ def modelling(df):
                 # dataClass = model.predict(x)
                 # st.write(dataClass)
 
-# Displays the performance of the model
+        if selected_algo == "Naive Bayes":
+            Y = encoded_target_data.values
+            X = remain_column.values
+
+            # Splitting dataset into train and test set
+            X_train, X_test, Y_train, Y_test = train_test_split(
+                X, Y, test_size=test_size, random_state=0
+            )
+
+            # training the model on training set
+            from sklearn.naive_bayes import GaussianNB
+
+            gnb = GaussianNB()
+            gnb.fit(X_train, Y_train)
+
+            # making predictions on the testing set
+            Y_pred = gnb.predict(X_test)
+
+            # comparing actual response values (y_test) with predicted response values (y_pred)
+            from sklearn import metrics
+
+            st.write(
+                "Model accuracy:",
+                metrics.accuracy_score(Y_test, Y_pred) * 100,
+            )
+            output(Y_test, Y_pred)
 
 
 def output(Y_test, Y_pred):
