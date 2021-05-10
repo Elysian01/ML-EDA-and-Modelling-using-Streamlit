@@ -97,11 +97,6 @@ def modelling(df):
                 st.info((correctly_classified / count) * 100)
                 output(Y_test, Y_pred)
 
-                # Custom Dataset Prediction
-                # x = np.array([[5.8000 , 2.8000,5.1000,2.4000]])
-                # dataClass = model.predict(x)
-                # st.write(dataClass)
-
         if selected_algo == "Naive Bayes":
             Y = encoded_target_data.values
             X = remain_column.values
@@ -128,6 +123,73 @@ def modelling(df):
                 metrics.accuracy_score(Y_test, Y_pred) * 100,
             )
             output(Y_test, Y_pred)
+
+    # Make Custom Prediction
+    if st.checkbox("Make custom prediction"):
+        count = 0
+        storevalues = []
+        convertto2D = []
+        for i in range(len(df.columns) - 1):
+            takeinput = st.number_input(df.columns[count], min_value=0.1, key=count)
+            convertto2D = [takeinput]
+            storevalues.append(convertto2D)
+            count += 1
+
+        # Predict the value
+        if st.button(
+            "Start Prediction",
+            help="Predicting the outcome of the values",
+        ):
+            if selected_algo == "Naive Bayes":
+                Y = encoded_target_data.values
+                X = remain_column.values
+
+                # Splitting dataset into train and test set
+                X_train, X_test, Y_train, Y_test = train_test_split(
+                    X, Y, test_size=test_size, random_state=0
+                )
+
+                # training the model on training set
+                from sklearn.naive_bayes import GaussianNB
+
+                gnb = GaussianNB()
+                gnb.fit(X_train, Y_train)
+
+                # making predictions on the testing set
+                Y_pred = gnb.predict(storevalues)
+
+                st.write(
+                    "Predicted value for the given custom data :",
+                    Y_pred[0],
+                )
+
+            # if selected_algo == "K_Nearest_Neighbors_Classifier":
+    
+            #     Y = encoded_target_data.values
+            #     X = remain_column.values
+
+            #     # Splitting dataset into train and test set
+            #     X_train, X_test, Y_train, Y_test = train_test_split(
+            #         X, Y, test_size=test_size, random_state=0
+            #     )
+
+            #     # Model training
+            #     if k_size != 0:
+
+            #         from sklearn.neighbors import KNeighborsClassifier
+
+            #         classifier = KNeighborsClassifier(
+            #             n_neighbors=k_size, metric="minkowski", p=2
+            #         )
+            #         classifier.fit(X_train, Y_train)
+
+            #         # making predictions on the testing set
+            #         Y_pred = classifier.predict(storevalues)
+
+            #         st.write(
+            #             "Predicted value for the given custom data :",
+            #             Y_pred[0],
+            #         )
 
 
 def output(Y_test, Y_pred):
