@@ -41,7 +41,7 @@ class LogisticRegression:
         return y_predicted_class
 
     def _sigmoid(self, x):
-        return 1/(1 + np.exp(-x))
+        return 1 / (1 + np.exp(-x))
 
 
 def accuracy(y_true, y_pred):
@@ -49,7 +49,7 @@ def accuracy(y_true, y_pred):
     return accuracy
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     pass
     # bc = datasets.load_breast_cancer()
 
@@ -63,3 +63,4 @@ if __name__ == '__main__':
     # regressor.fit(X_train, y_train)
     # predictions = regressor.predict(X_test)
     # print("Logistic Regression Accuracy: ", accuracy(y_test, predictions))
+e

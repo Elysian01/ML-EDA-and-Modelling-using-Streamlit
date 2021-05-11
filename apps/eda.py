@@ -8,8 +8,8 @@ from .utils import select_or_upload_dataset
 
 matplotlib.use("Agg")
 fig, ax = plt.subplots()
-matplotlib.rcParams.update({'font.size': 8})
-st.set_option('deprecation.showPyplotGlobalUse', False)
+matplotlib.rcParams.update({"font.size": 8})
+st.set_option("deprecation.showPyplotGlobalUse", False)
 
 
 def categorical_column(df, max_unique_values=15):
@@ -87,8 +87,7 @@ def eda(df):
         if x:
             if st.checkbox("Select Second Categorical column"):
                 hue_all_column_name = df[df.columns.difference([x])].columns
-                hue = st.selectbox(
-                    "Select Column for Count Plot", hue_all_column_name)
+                hue = st.selectbox("Select Column for Count Plot", hue_all_column_name)
                 st.write(sns.countplot(x=x, hue=hue, data=df, palette="Set2"))
             else:
                 st.write(sns.countplot(x=x, data=df, palette="Set2"))
@@ -100,21 +99,23 @@ def eda(df):
         selected_columns = st.selectbox("Select Column", all_columns)
         if selected_columns:
             st.success("Generating Pie Chart ...")
-            st.write(df[selected_columns].value_counts().plot.pie(
-                autopct="%1.1f%%"))
+            st.write(df[selected_columns].value_counts().plot.pie(autopct="%1.1f%%"))
             st.pyplot()
 
     # Customizable Plot
     st.subheader("Customizable Plot")
 
-    type_of_plot = st.selectbox("Select type of Plot", [
-                                "area", "bar", "line", "hist", "box", "kde"])
-    selected_columns_names = st.multiselect(
-        "Select Columns to plot", all_columns_names)
+    type_of_plot = st.selectbox(
+        "Select type of Plot", ["area", "bar", "line", "hist", "box", "kde"]
+    )
+    selected_columns_names = st.multiselect("Select Columns to plot", all_columns_names)
 
     if st.button("Generate Plot"):
-        st.success("Generating Customizable Plot of {} for {}".format(
-            type_of_plot, selected_columns_names))
+        st.success(
+            "Generating Customizable Plot of {} for {}".format(
+                type_of_plot, selected_columns_names
+            )
+        )
 
         custom_data = df[selected_columns_names]
         if type_of_plot == "area":

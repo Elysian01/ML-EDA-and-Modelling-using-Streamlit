@@ -9,6 +9,20 @@ from .utils import select_or_upload_dataset
 from apps.algo.logistic import LogisticRegression
 from apps.algo.knn import K_Nearest_Neighbors_Classifier
 
+from sklearn import metrics
+from sklearn.naive_bayes import GaussianNB
+
+gnb = GaussianNB()
+lr = LogisticRegression(lr=0.0001, epochs=1000)
+
+
+def categorical_column(df, max_unique_values=15):
+    categorical_column_list = []
+    for column in df.columns:
+        if df[column].nunique() < max_unique_values:
+            categorical_column_list.append(column)
+    return categorical_column_list
+
 
 def modelling(df):
 
@@ -18,7 +32,7 @@ def modelling(df):
         st.dataframe(df.head(number))
 
     # Select Algorithm
-    algos = ["Logistic Regression", "Naive Bayes", "K_Nearest_Neighbors_Classifier"]
+    algos = ["Logistic Regression", "Naive Bayes", "K Nearest Neighbors Classifier"]
     selected_algo = st.selectbox("Select Algorithm", algos)
     print(selected_algo)
 
@@ -26,8 +40,8 @@ def modelling(df):
         st.info("You Selected {} Algorithm".format(selected_algo))
 
     # Select the Taget Feature
-    column_name = df.columns
-    target_column = st.selectbox("Select Target Column", column_name)
+    cat_columns = categorical_column(df)
+    target_column = st.selectbox("Select Target Column", cat_columns)
     target_data = df[target_column]
 
     # Label Encoding
@@ -36,8 +50,10 @@ def modelling(df):
     encoded_target_data = pd.DataFrame(encoded_target_data, columns=[target_column])
     st.info("You Selected {} Column".format(target_column))
 
-    if (len(df.eval(target_column).unique()) > 25):
-        st.error("Please select any other dataset for classification")
+    if len(df.eval(target_column).unique()) > 25:
+        st.error(
+            "Please select classification dataset only, or the target column must be categorical"
+        )
 
     else:
 
@@ -54,7 +70,7 @@ def modelling(df):
         )
 
         # Set the size of K (only for K-NN)
-        if selected_algo == "K_Nearest_Neighbors_Classifier":
+        if selected_algo == "K Nearest Neighbors Classifier":
             k_size = st.number_input(
                 "Select the size of K",
                 min_value=0,
@@ -68,15 +84,28 @@ def modelling(df):
             "Start Training",
             help="Training will start for the selected algorithm on dataset",
         ):
-            if selected_algo == "K_Nearest_Neighbors_Classifier":
+            Y = encoded_target_data.values
+            X = remain_column.values
 
-                Y = encoded_target_data.values
-                X = remain_column.values
+            # Splitting dataset into train and test set
+            X_train, X_test, Y_train, Y_test = train_test_split(
+                X, Y, test_size=test_size, random_state=0
+            )
 
-                # Splitting dataset into train and test set
-                X_train, X_test, Y_train, Y_test = train_test_split(
-                    X, Y, test_size=test_size, random_state=0
+            if selected_algo == "Logistic Regression":
+                lr.fit(X_train, Y_train)
+
+                # making predictions on the testing set
+                Y_pred = lr.predict(X_test)
+
+                # comparing actual response values (y_test) with predicted response values (y_pred)
+                st.write(
+                    "Model accuracy of Logistic Regression Model:",
+                    metrics.accuracy_score(Y_test, Y_pred) * 100,
                 )
+                output(Y_test, Y_pred)
+
+            if selected_algo == "K Nearest Neighbors Classifier":
 
                 # Model training
                 if k_size != 0:
@@ -103,28 +132,14 @@ def modelling(df):
                     output(Y_test, Y_pred)
 
             if selected_algo == "Naive Bayes":
-                Y = encoded_target_data.values
-                X = remain_column.values
-
-                # Splitting dataset into train and test set
-                X_train, X_test, Y_train, Y_test = train_test_split(
-                    X, Y, test_size=test_size, random_state=0
-                )
-
-                # training the model on training set
-                from sklearn.naive_bayes import GaussianNB
-
-                gnb = GaussianNB()
                 gnb.fit(X_train, Y_train)
 
                 # making predictions on the testing set
                 Y_pred = gnb.predict(X_test)
 
                 # comparing actual response values (y_test) with predicted response values (y_pred)
-                from sklearn import metrics
-
                 st.write(
-                    "Model accuracy:",
+                    "Model accuracy of Naive Bayes Model:",
                     metrics.accuracy_score(Y_test, Y_pred) * 100,
                 )
                 output(Y_test, Y_pred)
@@ -133,11 +148,11 @@ def modelling(df):
         if st.checkbox("Make custom prediction"):
             count = 0
             storevalues = []
-            convertto2D = []
             for i in range(len(df.columns) - 1):
-                takeinput = st.number_input(df.columns[count], min_value=0.1, key=count)
-                convertto2D = [takeinput]
-                storevalues.append(convertto2D)
+                takeinput = st.number_input(
+                    df.columns[count], help=f"Example: {df.iloc[1][count]}", key=count
+                )
+                storevalues.append(takeinput)
                 count += 1
 
             # Predict the value
@@ -145,30 +160,17 @@ def modelling(df):
                 "Start Prediction",
                 help="Predicting the outcome of the values",
             ):
+                storevalues = np.expand_dims(storevalues, axis=0)
+
                 if selected_algo == "Naive Bayes":
-                    Y = encoded_target_data.values
-                    X = remain_column.values
-
-                    # Splitting dataset into train and test set
-                    X_train, X_test, Y_train, Y_test = train_test_split(
-                        X, Y, test_size=test_size, random_state=0
-                    )
-
-                    # training the model on training set
-                    from sklearn.naive_bayes import GaussianNB
-
-                    gnb = GaussianNB()
-                    gnb.fit(X_train, Y_train)
-
                     # making predictions on the testing set
                     Y_pred = gnb.predict(storevalues)
-
                     st.write(
                         "Predicted value for the given custom data :",
-                        Y_pred[0],
+                        label_encoder.inverse_transform(np.array(Y_pred)),
                     )
 
-                # if selected_algo == "K_Nearest_Neighbors_Classifier":
+                # if selected_algo == "K Nearest Neighbors Classifier":
 
                 #     Y = encoded_target_data.values
                 #     X = remain_column.values
