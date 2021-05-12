@@ -189,7 +189,6 @@ def modelling(df):
                 ):
                     storevalues = np.expand_dims(storevalues, axis=0)
                     storevalues = scaler.transform(storevalues)
-                    # print(storevalues)
 
                     if selected_algo == "Naive Bayes":
                         # making predictions on the testing set
