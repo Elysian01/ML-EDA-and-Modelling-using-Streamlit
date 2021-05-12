@@ -2,20 +2,20 @@ import streamlit as st
 import pandas as pd
 import numpy as np
 from sklearn.model_selection import train_test_split
-from sklearn.metrics import classification_report, confusion_matrix
+from sklearn.metrics import classification_report, confusion_matrix , precision_score , recall_score , f1_score
 from sklearn import preprocessing
 from sklearn.preprocessing import StandardScaler
-
+import matplotlib.pyplot as plt
 from .utils import select_or_upload_dataset
 from apps.algo.logistic import LogisticRegression, accuracy
 from apps.algo.knn import K_Nearest_Neighbors_Classifier
-from apps.algo.naive import Naive
-
+from sklearn.neighbors import KNeighborsClassifier
 from sklearn import metrics
 from sklearn.naive_bayes import GaussianNB
 
 gnb = GaussianNB()
 lr = LogisticRegression(lr=0.001, epochs=100)
+neigh = KNeighborsClassifier(n_neighbors=3)
 
 
 def modelling(df):
@@ -82,6 +82,7 @@ def modelling(df):
 
         # Set the size of K (only for K-NN)
         if selected_algo == "K Nearest Neighbors Classifier":
+            
             k_size = st.number_input(
                 "Select the size of K",
                 min_value=0,
@@ -90,6 +91,7 @@ def modelling(df):
                 step=1,
                 help="Set the ratio for splitting the Train and Test Dataset",
             )
+            
 
         if st.button(
             "Start Training",
@@ -130,12 +132,11 @@ def modelling(df):
 
                 # Model training
                 if k_size != 0:
-                    model = K_Nearest_Neighbors_Classifier(K=k_size)
-                    model.fit(X_train, y_train)
-                    show_custom_predictions = True
+                    knn_model = K_Nearest_Neighbors_Classifier(K=k_size)
+                    knn_model.fit(X_train, y_train)
 
                     # Prediction on test set
-                    Y_pred = model.predict(X_test)
+                    Y_pred = knn_model.predict(X_test)
 
                     # measure performance
                     correctly_classified = 0
@@ -151,6 +152,9 @@ def modelling(df):
                     st.write("Accuracy:")
                     st.info((correctly_classified / count) * 100)
                     output(y_test, Y_pred)
+
+                else:
+                    st.error('Cannot predict of K=0')
 
             if selected_algo == "Naive Bayes":
                 X_train, X_test, y_train, y_test = train_test_split(
@@ -204,6 +208,20 @@ def modelling(df):
                             "Predicted value for the given custom data :",
                             label_encoder.inverse_transform(np.array(y_pred)),
                         )
+                        
+                    if selected_algo == "K Nearest Neighbors Classifier":
+                        st.write(storevalues)
+                        # making predictions on the testing set
+                        #storevalues = np.array(storevalues)
+                        Y_pred = neigh.predict(storevalues)
+                        st.write(
+                            "Predicted value for the given custom data :",
+                            label_encoder.inverse_transform(np.array(y_pred))
+                        )
+                    #Custom Dataset Prediction 
+                    # x = np.array([[5.8000 , 2.8000,5.1000,2.4000]])
+                    # dataClass = model.predict(x)
+                    # st.write(dataClass)
 
                     # if selected_algo == "K Nearest Neighbors Classifier":
 
@@ -239,9 +257,14 @@ def output(y_test, y_pred):
     st.write("Confusion Matrix:")
     st.write(confusion_matrix_out)
 
-    classification_report_out = classification_report(y_test, y_pred)
     st.write("Classification Report:")
-    st.write(classification_report_out)
+    precision_score_out = precision_score(y_test, y_pred)
+    recall_score_out = recall_score(y_test, y_pred)
+    f1_score_out = f1_score(y_test, y_pred)
+    
+    data = [['Precison Score', precision_score_out], ['Recall Score', recall_score_out], ['f1 Score', f1_score_out]]
+    df = pd.DataFrame(data, columns = ['Parameter', 'Value'])
+    st.table(df)
 
 
 def app():
