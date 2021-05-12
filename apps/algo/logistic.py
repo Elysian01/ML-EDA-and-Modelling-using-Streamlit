@@ -1,6 +1,7 @@
 # from sklearn.model_selection import train_test_split
 # from sklearn import datasets
 import numpy as np
+import pandas as pd
 from numpy import log, dot, e
 from numpy.random import rand
 

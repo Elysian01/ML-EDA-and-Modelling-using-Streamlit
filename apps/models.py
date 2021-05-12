@@ -15,10 +15,12 @@ from sklearn.naive_bayes import GaussianNB
 
 gnb = GaussianNB()
 lr = LogisticRegression(lr=0.001, epochs=100)
-model = K_Nearest_Neighbors_Classifier(K=4)
+neigh = KNeighborsClassifier(n_neighbors=3)
 
 
 def modelling(df):
+
+    show_custom_predictions = True  # for show custom predictions checkbox
 
     # Show Dataset
     if st.checkbox("Show Dataset"):
@@ -26,7 +28,11 @@ def modelling(df):
         st.dataframe(df.head(number))
 
     # Select Algorithm
-    algos = ["Logistic Regression", "Naive Bayes", "K Nearest Neighbors Classifier"]
+    algos = [
+        "Logistic Regression For Binary Classification",
+        "Naive Bayes",
+        "K Nearest Neighbors Classifier",
+    ]
     selected_algo = st.selectbox("Select Algorithm", algos)
 
     if selected_algo:
@@ -37,12 +43,16 @@ def modelling(df):
     target_column = st.selectbox("Select Target Column", all_columns)
     target_data = df[target_column]
 
+    if target_column:
+        if st.checkbox("Show Value Count of Target Feature"):
+            st.write(df[target_column].value_counts())
+
     # Label Encoding
     label_encoder = preprocessing.LabelEncoder()
     encoded_target_data = label_encoder.fit_transform(target_data)
     encoded_target_data_knn = pd.DataFrame(encoded_target_data, columns=[target_column])
     st.info("You Selected {} Column".format(target_column))
-    remain_column = df.drop([target_column], axis = 1)
+    remain_column = df.drop([target_column], axis=1)
 
     if len(df.eval(target_column).unique()) > 25:
         st.error(
@@ -90,29 +100,35 @@ def modelling(df):
 
             # Splitting dataset into train and test set
 
-            if selected_algo == "Logistic Regression":
+            if selected_algo == "Logistic Regression For Binary Classification":
                 X_train, X_test, y_train, y_test = train_test_split(
-                X, y, test_size=test_size, random_state=1234
-            )
-
-
-                lr.fit(X_train, y_train)
-
-                # making predictions on the testing set
-                y_pred = lr.predict(X_test)
-                print("Accuracy: ", accuracy(y_test, y_pred))
-
-                # comparing actual response values (y_test) with predicted response values (y_pred)
-                st.write(
-                    "Model accuracy of Logistic Regression Model:",
-                    metrics.accuracy_score(y_test, y_pred) * 100,
+                    X, y, test_size=test_size, random_state=1234
                 )
-                output(y_test, y_pred)
+
+                if len(set(y)) == 2:
+                    lr.fit(X_train, y_train)
+                    show_custom_predictions = True
+
+                    # making predictions on the testing set
+                    y_pred = lr.predict(X_test)
+                    print("Accuracy: ", accuracy(y_test, y_pred))
+
+                    # comparing actual response values (y_test) with predicted response values (y_pred)
+                    st.write(
+                        "Model accuracy of Logistic Regression Model:",
+                        metrics.accuracy_score(y_test, y_pred) * 100,
+                    )
+                    output(y_test, y_pred)
+                else:
+                    show_custom_predictions = False
+                    st.error(
+                        "The Target feature has more than 2 classes, please select another dataset or a different classification algorithm."
+                    )
 
             if selected_algo == "K Nearest Neighbors Classifier":
                 X_train, X_test, y_train, y_test = train_test_split(
-                X_knn, y_knn, test_size=test_size, random_state=1234
-            )
+                    X_knn, y_knn, test_size=test_size, random_state=1234
+                )
 
                 # Model training
                 if k_size != 0:
@@ -142,12 +158,12 @@ def modelling(df):
 
             if selected_algo == "Naive Bayes":
                 X_train, X_test, y_train, y_test = train_test_split(
-                X, y, test_size=test_size, random_state=1234
-            )
-                gnb.fit(X_train, y_train)
+                    X, y, test_size=test_size, random_state=1234
+                )
 
-                # making predictions on the testing set
-                Y_pred = gnb.predict(X_test)
+                model = Naive()
+                model.fit(X_train, y_train)
+                Y_pred = model.predict(X_test)
 
                 # comparing actual response values (y_test) with predicted response values (y_pred)
                 st.write(
@@ -157,38 +173,22 @@ def modelling(df):
                 output(y_test, Y_pred)
 
         # Make Custom Prediction
-        if st.checkbox("Make custom prediction"):
-            count = 0
-            storevalues = []
-            for i in range(len(df.columns) - 1):
-                takeinput = st.number_input(
-                    df.columns[count], help=f"Example: {df.iloc[1][count]}", key=count
-                )
-                storevalues.append(takeinput)
-                count += 1
-
-            # Predict the value
-            if st.button(
-                "Start Prediction",
-                help="Predicting the outcome of the values",
-            ):
-                storevalues = np.expand_dims(storevalues, axis=0)
-                storevalues = scaler.transform(storevalues)
-                print(storevalues)
-
-                if selected_algo == "Naive Bayes":
-                    # making predictions on the testing set
-                    Y_pred = gnb.predict(storevalues)
-                    st.write(
-                        "Predicted value for the given custom data :",
-                        label_encoder.inverse_transform(np.array(Y_pred)),
+        if show_custom_predictions:
+            if st.checkbox("Make custom prediction"):
+                count = 0
+                storevalues = []
+                for i in range(len(df.columns) - 1):
+                    takeinput = st.number_input(
+                        df.columns[count],
+                        help=f"Example: {df.iloc[2][count]}",
+                        key=count,
                     )
                 
                 if selected_algo == "K Nearest Neighbors Classifier":
                     st.write(storevalues)
                     # making predictions on the testing set
-                    storevalues = np.array(storevalues)
-                    Y_pred = model.predict(storevalues)
+                    #storevalues = np.array(storevalues)
+                    Y_pred = neigh.predict(storevalues)
                     st.write(
                         "Predicted value for the given custom data :",
                         Y_pred
