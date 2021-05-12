@@ -2,20 +2,24 @@ import streamlit as st
 import pandas as pd
 import numpy as np
 from sklearn.model_selection import train_test_split
-from sklearn.metrics import classification_report, confusion_matrix , precision_score , recall_score , f1_score
+from sklearn.metrics import (
+    classification_report,
+    confusion_matrix,
+    precision_score,
+    recall_score,
+    f1_score,
+)
 from sklearn import preprocessing
 from sklearn.preprocessing import StandardScaler
 import matplotlib.pyplot as plt
 from .utils import select_or_upload_dataset
 from apps.algo.logistic import LogisticRegression, accuracy
 from apps.algo.knn import K_Nearest_Neighbors_Classifier
-from sklearn.neighbors import KNeighborsClassifier
+from apps.algo.naive import Naive
 from sklearn import metrics
-from sklearn.naive_bayes import GaussianNB
 
-gnb = GaussianNB()
+naive_model = Naive()
 lr = LogisticRegression(lr=0.001, epochs=100)
-neigh = KNeighborsClassifier(n_neighbors=3)
 
 
 def modelling(df):
@@ -82,7 +86,7 @@ def modelling(df):
 
         # Set the size of K (only for K-NN)
         if selected_algo == "K Nearest Neighbors Classifier":
-            
+
             k_size = st.number_input(
                 "Select the size of K",
                 min_value=0,
@@ -91,7 +95,6 @@ def modelling(df):
                 step=1,
                 help="Set the ratio for splitting the Train and Test Dataset",
             )
-            
 
         if st.button(
             "Start Training",
@@ -154,16 +157,15 @@ def modelling(df):
                     output(y_test, Y_pred)
 
                 else:
-                    st.error('Cannot predict of K=0')
+                    st.error("Cannot predict of K=0")
 
             if selected_algo == "Naive Bayes":
                 X_train, X_test, y_train, y_test = train_test_split(
                     X, y, test_size=test_size, random_state=1234
                 )
 
-                model = Naive()
-                model.fit(X_train, y_train)
-                Y_pred = model.predict(X_test)
+                naive_model.fit(X_train, y_train)
+                Y_pred = naive_model.predict(X_test)
 
                 # comparing actual response values (y_test) with predicted response values (y_pred)
                 st.write(
@@ -196,7 +198,7 @@ def modelling(df):
 
                     if selected_algo == "Naive Bayes":
                         # making predictions on the testing set
-                        Y_pred = gnb.predict(storevalues)
+                        Y_pred = naive_model.predict(storevalues)
                         st.write(
                             "Predicted value for the given custom data :",
                             label_encoder.inverse_transform(np.array(Y_pred)),
@@ -208,17 +210,17 @@ def modelling(df):
                             "Predicted value for the given custom data :",
                             label_encoder.inverse_transform(np.array(y_pred)),
                         )
-                        
+
                     if selected_algo == "K Nearest Neighbors Classifier":
                         st.write(storevalues)
                         # making predictions on the testing set
-                        #storevalues = np.array(storevalues)
-                        Y_pred = neigh.predict(storevalues)
+                        # storevalues = np.array(storevalues)
+                        Y_pred = knn_model.predict(storevalues)
                         st.write(
                             "Predicted value for the given custom data :",
-                            label_encoder.inverse_transform(np.array(y_pred))
+                            label_encoder.inverse_transform(np.array(y_pred)),
                         )
-                    #Custom Dataset Prediction 
+                    # Custom Dataset Prediction
                     # x = np.array([[5.8000 , 2.8000,5.1000,2.4000]])
                     # dataClass = model.predict(x)
                     # st.write(dataClass)
@@ -261,9 +263,13 @@ def output(y_test, y_pred):
     precision_score_out = precision_score(y_test, y_pred)
     recall_score_out = recall_score(y_test, y_pred)
     f1_score_out = f1_score(y_test, y_pred)
-    
-    data = [['Precison Score', precision_score_out], ['Recall Score', recall_score_out], ['f1 Score', f1_score_out]]
-    df = pd.DataFrame(data, columns = ['Parameter', 'Value'])
+
+    data = [
+        ["Precison Score", precision_score_out],
+        ["Recall Score", recall_score_out],
+        ["f1 Score", f1_score_out],
+    ]
+    df = pd.DataFrame(data, columns=["Parameter", "Value"])
     st.table(df)
 
 
