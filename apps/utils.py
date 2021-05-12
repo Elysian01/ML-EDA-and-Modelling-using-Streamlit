@@ -28,6 +28,7 @@ def select_or_upload_dataset(callback_function):
 
         # Read Data
         df = pd.read_csv(filename)
+        df.dropna(inplace=True)
         callback_function(df)  # Execute callback function
 
     elif dataframe_selection == "Upload my own dataset":
@@ -36,4 +37,5 @@ def select_or_upload_dataset(callback_function):
             data.seek(0)
             st.success("Uploaded Dataset Successfully")
             df = pd.read_csv(data)
+            df.dropna(inplace=True)
             callback_function(df)  # Execute callback function

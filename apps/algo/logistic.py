@@ -1,6 +1,8 @@
 # from sklearn.model_selection import train_test_split
 # from sklearn import datasets
 import numpy as np
+from numpy import log, dot, e
+from numpy.random import rand
 
 
 class LogisticRegression:
@@ -11,34 +13,31 @@ class LogisticRegression:
         self.bias = None
 
     def fit(self, X, y):
-        # init parameters
         n_samples, n_features = X.shape
-        self.weights = np.zeros(n_features)
+
+        # init parameters
+        self.weights = rand(n_features)
         self.bias = 0
 
-        print("Logistic Regression Training Started...")
-
-        # Gradient Descent
+        # gradient descent
         for _ in range(self.epochs):
-            # we take the linear model(y = m*x + c) and then apply sigmoid activation function to squeeze the output 0 and 1
-            z = np.dot(X, self.weights) + self.bias
-            y_predicted = self._sigmoid(z)
+            # approximate y with linear combination of weights and x, plus bias
+            linear_model = np.dot(X, self.weights) + self.bias
+            # apply sigmoid function
+            y_predicted = self._sigmoid(linear_model)
 
-            # Calculating derivatives
+            # compute gradients
             dw = (1 / n_samples) * np.dot(X.T, (y_predicted - y))
             db = (1 / n_samples) * np.sum(y_predicted - y)
-
-            # Update parameters
-            self.weights = self.weights - self.lr * dw
-            self.bias = self.bias - self.lr * db
-
-        print("Logistic Regression Training Completed")
+            # update parameters
+            self.weights -= self.lr * dw
+            self.bias -= self.lr * db
 
     def predict(self, X):
-        z = np.dot(X, self.weights) + self.bias
-        y_predicted = self._sigmoid(z)
-        y_predicted_class = [1 if y > 0.5 else 0 for y in y_predicted]
-        return y_predicted_class
+        linear_model = np.dot(X, self.weights) + self.bias
+        y_predicted = self._sigmoid(linear_model)
+        y_predicted_cls = [1 if i > 0.5 else 0 for i in y_predicted]
+        return np.array(y_predicted_cls)
 
     def _sigmoid(self, x):
         return 1 / (1 + np.exp(-x))
