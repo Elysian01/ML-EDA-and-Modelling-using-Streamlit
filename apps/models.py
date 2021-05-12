@@ -9,6 +9,7 @@ from sklearn.preprocessing import StandardScaler
 from .utils import select_or_upload_dataset
 from apps.algo.logistic import LogisticRegression, accuracy
 from apps.algo.knn import K_Nearest_Neighbors_Classifier
+from apps.algo.naive import Naive
 
 from sklearn import metrics
 from sklearn.naive_bayes import GaussianNB
@@ -139,10 +140,10 @@ def modelling(df):
                 X_train, X_test, y_train, y_test = train_test_split(
                 X, y, test_size=test_size, random_state=1234
             )
-                gnb.fit(X_train, y_train)
-
-                # making predictions on the testing set
-                Y_pred = gnb.predict(X_test)
+                
+                model = Naive()
+                model.fit(X_train, y_train)
+                Y_pred = model.predict(X_test)
 
                 # comparing actual response values (y_test) with predicted response values (y_pred)
                 st.write(
