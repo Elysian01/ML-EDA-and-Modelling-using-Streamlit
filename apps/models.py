@@ -17,6 +17,7 @@ from apps.algo.logistic import LogisticRegression, accuracy
 from apps.algo.knn import K_Nearest_Neighbors_Classifier
 from apps.algo.naive import Naive
 from sklearn import metrics
+from sklearn.neighbors import KNeighborsClassifier
 
 naive_model = Naive()
 lr = LogisticRegression(lr=0.001, epochs=100)
@@ -62,7 +63,7 @@ def modelling(df):
         st.error(
             "Please select classification dataset only, or the target column must be categorical"
         )
-
+    
     else:
 
         # Select the Remaining Feature and scaling them
@@ -212,46 +213,20 @@ def modelling(df):
                         )
 
                     if selected_algo == "K Nearest Neighbors Classifier":
-                        st.write(storevalues)
-                        # making predictions on the testing set
-                        # storevalues = np.array(storevalues)
-                        Y_pred = knn_model.predict(storevalues)
+                        X_train, X_test, y_train, y_test = train_test_split(
+                    X_knn, y_knn, test_size=test_size, random_state=1234
+                )
+                        
+                        knn_models = KNeighborsClassifier(n_neighbors=k_size)
+
+                        knn_models.fit(X_train, y_train)
+
+                        y_pred = knn_models.predict(storevalues)
+
                         st.write(
                             "Predicted value for the given custom data :",
                             label_encoder.inverse_transform(np.array(y_pred)),
                         )
-                    # Custom Dataset Prediction
-                    # x = np.array([[5.8000 , 2.8000,5.1000,2.4000]])
-                    # dataClass = model.predict(x)
-                    # st.write(dataClass)
-
-                    # if selected_algo == "K Nearest Neighbors Classifier":
-
-                    #     Y = encoded_target_data.values
-                    #     X = remain_column.values
-
-                    #     # Splitting dataset into train and test set
-                    #     X_train, X_test, y_train, y_test = train_test_split(
-                    #         X, Y, test_size=test_size, random_state=0
-                    #     )
-
-                    #     # Model training
-                    #     if k_size != 0:
-
-                    #         from sklearn.neighbors import KNeighborsClassifier
-
-                    #         classifier = KNeighborsClassifier(
-                    #             n_neighbors=k_size, metric="minkowski", p=2
-                    #         )
-                    #         classifier.fit(X_train, y_train)
-
-                    #         # making predictions on the testing set
-                    #         Y_pred = classifier.predict(storevalues)
-
-                    #         st.write(
-                    #             "Predicted value for the given custom data :",
-                    #             Y_pred[0],
-                    #         )
 
 
 def output(y_test, y_pred):
