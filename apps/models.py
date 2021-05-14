@@ -18,6 +18,7 @@ from apps.algo.knn import K_Nearest_Neighbors_Classifier
 from apps.algo.naive import Naive
 from sklearn import metrics
 from sklearn.neighbors import KNeighborsClassifier
+from sklearn.naive_bayes import GaussianNB
 
 naive_model = Naive()
 lr = LogisticRegression(lr=0.001, epochs=100)
@@ -198,8 +199,16 @@ def modelling(df):
                     storevalues = scaler.transform(storevalues)
 
                     if selected_algo == "Naive Bayes":
+                        X_train, X_test, y_train, y_test = train_test_split(
+                    X, y, test_size=test_size, random_state=1234
+                )
+                        gnb = GaussianNB()
+                        gnb.fit(X_train, y_train)
+
+                # making predictions on the testing set
+                        Y_pred = gnb.predict(storevalues)
                         # making predictions on the testing set
-                        Y_pred = naive_model.predict(storevalues)
+                        
                         st.write(
                             "Predicted value for the given custom data :",
                             label_encoder.inverse_transform(np.array(Y_pred)),
