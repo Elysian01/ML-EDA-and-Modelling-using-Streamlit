@@ -13,7 +13,7 @@ class Naive():
         calculate prior probabilities
         '''
         self.prior = (features.groupby(target).apply(lambda x: len(x)) / self.rows).to_numpy()
-
+        print(self.prior)
         return self.prior
     
     def calc_statistics(self, features, target):
@@ -52,12 +52,14 @@ class Naive():
             posteriors.append(posterior)
         # return class with highest posterior probability
         return self.classes[np.argmax(posteriors)]
-     
+
 
     def fit(self, features, target):
         self.classes = np.unique(target)
         self.count = len(self.classes)
+        # gives the number of columns
         self.feature_nums = features.shape[1]
+        # gives the number of rows
         self.rows = features.shape[0]
         
         self.calc_statistics(features, target)
