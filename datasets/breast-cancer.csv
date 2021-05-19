@@ -1,4 +1,4 @@
-Cl.thickness,Cell.size,Cell.shape,Marg.adhesion,Epith.c.size,Bare.nuclei,Bl.cromatin,Normal.nucleoli,Mitoses,Class
+Cl_thickness,Cell_size,Cell_shape,Marg_adhesion,Epith_c_size,Bare_nuclei,Bl_cromatin,Normal_nucleoli,Mitoses,Class
 5,1,1,1,2,1.0,3,1,1,0
 5,4,4,5,7,10.0,3,2,1,0
 3,1,1,1,2,2.0,3,1,1,0
